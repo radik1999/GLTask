@@ -20,3 +20,23 @@ class Graph:
 
     def add_edges(self, *edges: Edge):
         self.edges.extend(edges)
+
+    def get_node_parent(self, node_name: str) -> Node | None:
+        resource_edge = next(filter(lambda edge: edge.child.name == node_name, self.edges), None)
+        if resource_edge:
+            return resource_edge.parent
+
+    def get_node_descendants(self, node_name: str) -> list[Node]:
+        descendants = []
+
+        def dfs(name: str):
+            children = self.get_node_children(name)
+            for child in children:
+                descendants.append(child)
+                dfs(child.name)
+
+        dfs(node_name)
+        return descendants
+
+    def get_node_children(self, node_name: str) -> list[Node]:
+        return [edge.child for edge in self.edges if edge.parent.name == node_name]
